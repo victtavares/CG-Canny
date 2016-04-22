@@ -1,0 +1,112 @@
+<html>
+	
+	<head>
+		<title>MATA65 - Computacao Grafica</title>
+		<h1>Algoritmos de Shading.</h1>
+		<h3>Tipos de material na Three.JS: <i>meshShaderMaterial</i>.</h3>
+	</head>
+	
+	<script id="toon-vs" type="x-shader/x-vertex">		
+		varying vec3 vNormal; 
+		varying vec3 vPosW;
+		
+		void main(void) { 		
+			vPosW = (modelMatrix * vec4(position, 1.0)).xyz; 
+			vNormal = normalize(normalMatrix * normal); 			
+			
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );  
+			} 
+
+
+	</script>
+	
+	<script id="toon-fs" type="x-shader/x-fragment">
+		precision mediump float; 
+		
+		uniform vec3 uLPos; 
+		uniform	float fs;
+		uniform	float bs;
+		uniform	float bb;
+		uniform	float ssb;
+
+		uniform float fh;
+		uniform	float bh;
+		uniform	float sbh;
+		
+		varying vec3 vNormal; 
+		varying vec3 vPosW;
+		
+		float calcMi(float L_N) {
+			
+			if (L_N >= fs + ssb)
+				return bb;
+			if (L_N <= fs - ssb)
+				return bs;
+			
+			return  ( ( L_N - ( fs - ssb ) ) * bb / 2.0 * ssb ) + 
+					( ( ( fs + ssb ) - L_N ) * bs / 2.0 * ssb ); 
+			}
+		
+		float calcVm(float R_V) {
+			
+			if (R_V <= 1.0 - fh - sbh)
+				return 0.0;
+			if (R_V > 1.0 - fh + sbh)
+				return bh;
+			
+			return  ( R_V - ( 1.0 - fh - sbh ) ) * bh / 2.0 * sbh; 
+			}
+		
+		void main(void) {
+		 	vec4 lColor		= vec4(1.0, 1.0, 1.0, 1.0); 
+		 	vec4 matAmb		= vec4(0.2, 0.2, 0.2, 1.0); 
+		 	vec4 matDif 	= vec4(0.2, 1.0, 0.2, 1.0); 
+		 	vec4 matSpec	= vec4(1.0, 1.0, 1.0, 1.0); 
+		 	
+		 	vec4 ambient = vec4(lColor.rgb * matAmb.rgb, matAmb.a); 
+		
+		 	vec3 vL = normalize(uLPos - vPosW); 
+		 	float teta = max(dot(vL, vNormal), 0.0); 
+		 	
+		 	float mi = calcMi(teta);
+					
+		 	vec4 diffuse = vec4(lColor.rgb * matDif.rgb * mi, matDif.a); 
+	
+		 	vec3 vV = normalize(cameraPosition - vPosW); 
+		 	vec3 vR = normalize(reflect(-vL, vNormal)); 
+		 	float omega = max(dot(vV, vR), 0.0); 
+		 	
+		 	float vm = calcVm(omega);
+		 	
+		 	vec4 specular = vec4(lColor.rgb * matSpec.rgb * vm, matSpec.a); 
+			
+		 	gl_FragColor = clamp(ambient + diffuse + specular, 0.0, 1.0); 
+			} 	
+	</script>
+
+	<script type="text/javascript" src="../libs/three.js"></script>
+	<script type="text/javascript" src="../libs/examples/js/libs/dat.gui.min.js"></script>
+  <script type="text/javascript" src="../libs/examples/js/controls/OrbitControls.js"></script>
+  <script type="text/javascript" src="../libs/examples/js/loaders/OBJLoader.js"></script>
+    <script type="text/javascript" src="../libs/examples/js/shaders/CopyShader.js"></script>
+
+  <!-- post processing files -->
+  <script type="text/javascript" src="../libs/examples/js/postprocessing/ShaderPass.js"></script>
+  <script type="text/javascript" src="../libs/examples/js/postprocessing/EffectComposer.js"></script>
+  <script type="text/javascript" src="../libs/examples/js/postprocessing/MaskPass.js"></script>
+  <script type="text/javascript" src="../libs/examples/js/postprocessing/RenderPass.js"></script>
+
+ 	<!-- shaders -->
+ 	<script type="text/javascript" src="grayShader.js"></script>
+ 	<script type="text/javascript" src="smoothShader.js"></script>
+ 	<script type="text/javascript" src="gradientShader.js"></script>
+ 	<script type="text/javascript" src="thresholdingShader.js"></script>
+ 	
+
+
+	<script type="text/javascript" src="ToonShader.js"></script>
+	
+	<body onload="init();">
+		<div id="WebGL-output" ></div>
+	</body>
+</html>
