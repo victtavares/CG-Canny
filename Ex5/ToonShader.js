@@ -123,11 +123,10 @@ function buildScene(loadedMesh) {
 
 			scene.add(loadedMesh);
 
-		//Processando os shaders
+		//Renderizações
 		composer = new THREE.EffectComposer(renderer);
-		// Criando os passos de renderizacao
+		
 		composer.addPass( new THREE.RenderPass(scene, camera));
-
 		var grayShaderPass = new THREE.ShaderPass(THREE.grayShader);
 		//grayShaderPass.renderToScreen = true;
 		composer.addPass(grayShaderPass);

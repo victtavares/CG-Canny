@@ -26,7 +26,7 @@ THREE.thresholdingShader = {
             'vec4 color = texture2D(tDiffuse, vUv);',
             'vec3 colorRGB = color.rgb;',
             'if (colorRGB.r > highThreshold) { gl_FragColor = vec4( 1.0, 1.0, 1.0, color.a ); } ',
-            'else if ((colorRGB.r >= lowThreshold) &&  (colorRGB.r <=  lowThreshold)) {gl_FragColor = vec4( 0.5, 0.5, 0.5, color.a ); }',
+            'else if ((colorRGB.r >= lowThreshold) &&  (colorRGB.r <=  highThreshold)) {gl_FragColor = vec4( 0.5, 0.5, 0.5, color.a ); }',
             'else { gl_FragColor = vec4( 0.0, 0.0, 0.0, color.a ); }',
 
         '}'
